@@ -1,0 +1,93 @@
+.\"	$OpenBSD: $
+.\"
+.\" Copyright (c) 2002 Douglas Crockford  (www.crockford.com)
+.\"
+.\" Permission is hereby granted, free of charge, to any person obtaining a copy of
+.\" this software and associated documentation files (the "Software"), to deal in
+.\" the Software without restriction, including without limitation the rights to
+.\" use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+.\" of the Software, and to permit persons to whom the Software is furnished to do
+.\" so, subject to the following conditions:
+.\"
+.\" The above copyright notice and this permission notice shall be included in all
+.\" copies or substantial portions of the Software.
+.\"
+.\" The Software shall be used for Good, not Evil.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+.\" IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+.\" FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+.\" AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+.\" LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+.\" OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+.\" SOFTWARE.
+.\"
+.Dd $Mdocdate: July 26 2013 $
+.Dt JSMIN 1
+.Os
+.Sh NAME
+.Nm jsmin
+.Nd javascript minifier
+.Sh SYNOPSIS
+.Nm jsmin < FILE.js > FILE.min.js [COMMENT]
+.Sh DESCRIPTION
+.Nm
+is a filter that removes comments and unnecessary whitespace from
+JavaScript files. It typically reduces filesize by half, resulting in faster
+downloads. It also encourages a more expressive programming style because it
+eliminates the download cost of clean, literate self-documentation.
+.Pp
+.Nm
+is a filter that omits or modifies some characters. This does not change
+the behavior of the program that it is minifying. The result may be harder to
+debug. It will definitely be harder to read.
+.Pp
+.Nm
+first replaces carriage returns ('\\r') with linefeeds ('\\n'). It replaces
+all other control characters (including tab) with spaces. It replaces comments
+in the // form with linefeeds. It replaces comments in the /* */ form with
+spaces. All runs of spaces are replaced with a single space. All runs of
+linefeeds are replaced with a single linefeed.
+.Pp
+It omits spaces except when a space is preceded and followed by a non-ASCII
+character or by an ASCII letter or digit, or by one of these characters:
+    \\ $ _
+.Pp
+It is more conservative in omitting linefeeds, because linefeeds are sometimes
+treated as semicolons. A linefeed is not omitted if it precedes a non-ASCII
+character or an ASCII letter or digit or one of these characters:
+    \\ $ _ { [ ( + -
+.Pp
+and if it follows a non-ASCII character or an ASCII letter or digit or one of
+these characters:
+    \\ $ _ } ] ) + - \" \'
+.Pp
+No other characters are omitted or modified.
+.Nm
+knows to not modify quoted strings and regular expression literals.
+.Nm
+does not obfuscate, but it does uglify.
+.Sh CAVEAT
+.Nm
+requires, but does not verify, that the character set encoding of the
+input program is either ASCII or UTF-8. It might not work correctly with other
+encodings.
+.Pp
+Be sure to retain your original source file. JSMin is a one-way trip: Once done,
+it cannot be undone.
+.Pp
+Do not put raw control characters inside a quoted string. That is an extremely
+bad practice. Use \\x<i>hh</i> notation instead. JSMin will replace control
+characters with spaces or linefeeds
+.Sh EXIT STATUS
+.Nm
+can produce three error messages to stderr:
+    o   Unterminated comment.
+    o   Unterminated string constant.
+    o   Unterminated regular expression.
+.Pp
+It ignores all other errors that may be present in your source program.
+Use of JSLint is strongly recommended.
+.Sh AUTHOR
+.Nm
+was written by Douglas Crockford.
